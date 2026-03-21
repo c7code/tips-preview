@@ -20,7 +20,7 @@ export default function Header() {
       <div className="header-brand">
         <div className="header-brand-icon">⚽</div>
         <h1>
-          Football <span>Analytics</span>
+          Crashed<span>Bet</span>
         </h1>
       </div>
       <div className="header-right">

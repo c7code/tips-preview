@@ -208,5 +208,5 @@ Forneça:
 });
 
 app.listen(PORT, () => {
-  console.log(`⚽ Football Analytics API proxy running on http://localhost:${PORT}`);
+  console.log(`⚽ CrashedBet API proxy running on http://localhost:${PORT}`);
 });
