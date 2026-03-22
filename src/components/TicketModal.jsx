@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Ticket, X, Loader2, RefreshCw, Trophy, Target } from 'lucide-react'
 import { fetchOdds } from '../api/footballApi'
 import { parseOddsData, generateTicket } from '../utils/ticketGenerator'
+import { LEAGUES } from './Sidebar'
 
 function formatDate(offset = 0) {
   const d = new Date()
@@ -31,14 +32,14 @@ export default function TicketModal({ show, onClose }) {
       const today = formatDate(0)
       const tomorrow = formatDate(1)
 
-      // Fetch odds for today and tomorrow
-      const oddsData = await fetchOdds(today, tomorrow)
-
-      if (!Array.isArray(oddsData) || oddsData.length === 0) {
-        setError('Nenhuma odd disponível no momento. Tente novamente mais tarde.')
-        setLoading(false)
-        return
-      }
+      // Fetch odds for each configured league in parallel
+      const leaguePromises = LEAGUES.map(league =>
+        fetchOdds(today, tomorrow, league.id).then(data =>
+          Array.isArray(data) ? data : []
+        ).catch(() => [])
+      )
+      const results = await Promise.all(leaguePromises)
+      const oddsData = results.flat()
 
       const matchesWithOdds = parseOddsData(oddsData)
 

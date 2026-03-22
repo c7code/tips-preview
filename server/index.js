@@ -137,19 +137,27 @@ app.get('/api/odds', async (req, res) => {
           league_name: ev.league_name,
           match_date: ev.match_date,
           match_time: ev.match_time,
+          match_status: ev.match_status,
           league_id: ev.league_id,
         };
       }
     }
 
     // Deduplicate: keep only one odds entry per match_id (first bookmaker)
+    // Filter: only matches that have NOT started yet
     const seen = new Set();
     const enriched = [];
     for (const odd of oddsData) {
       if (seen.has(odd.match_id)) continue;
       seen.add(odd.match_id);
 
-      const ev = eventsMap[odd.match_id] || {};
+      const ev = eventsMap[odd.match_id];
+      if (!ev) continue; // skip if no event data
+
+      // Only include matches not yet started
+      const status = (ev.match_status || '').trim();
+      if (status !== '' && status !== 'Not Started' && status !== 'Scheduled' && status !== '—') continue;
+
       enriched.push({
         ...odd,
         match_hometeam_name: ev.match_hometeam_name || '',
