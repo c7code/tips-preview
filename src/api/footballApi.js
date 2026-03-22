@@ -37,6 +37,15 @@ export async function fetchPredictions(leagueId, from, to) {
   return res.json();
 }
 
+export async function fetchOdds(from, to, leagueId) {
+  const params = new URLSearchParams();
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+  if (leagueId) params.set('leagueId', leagueId);
+  const res = await fetch(`${API_BASE}/odds?${params}`);
+  return res.json();
+}
+
 export async function fetchAiAnalysis(matchData) {
   const res = await fetch(`${API_BASE}/analyze`, {
     method: 'POST',

@@ -111,6 +111,61 @@ app.get('/api/predictions', async (req, res) => {
   }
 });
 
+// GET /api/odds?from=&to=&leagueId=
+// Enriches odds with match info (team names, league, date, time)
+app.get('/api/odds', async (req, res) => {
+  try {
+    const { from, to, leagueId } = req.query;
+    const oddsParams = { action: 'get_odds', from, to };
+    if (leagueId) oddsParams.league_id = leagueId;
+
+    // Fetch odds and events in parallel
+    const [oddsData, eventsData] = await Promise.all([
+      footballApi(oddsParams),
+      footballApi({ action: 'get_events', from, to, ...(leagueId ? { league_id: leagueId } : {}) }),
+    ]);
+
+    if (!Array.isArray(oddsData)) return res.json(oddsData);
+
+    // Build a lookup map from events: match_id -> event info
+    const eventsMap = {};
+    if (Array.isArray(eventsData)) {
+      for (const ev of eventsData) {
+        eventsMap[ev.match_id] = {
+          match_hometeam_name: ev.match_hometeam_name,
+          match_awayteam_name: ev.match_awayteam_name,
+          league_name: ev.league_name,
+          match_date: ev.match_date,
+          match_time: ev.match_time,
+          league_id: ev.league_id,
+        };
+      }
+    }
+
+    // Deduplicate: keep only one odds entry per match_id (first bookmaker)
+    const seen = new Set();
+    const enriched = [];
+    for (const odd of oddsData) {
+      if (seen.has(odd.match_id)) continue;
+      seen.add(odd.match_id);
+
+      const ev = eventsMap[odd.match_id] || {};
+      enriched.push({
+        ...odd,
+        match_hometeam_name: ev.match_hometeam_name || '',
+        match_awayteam_name: ev.match_awayteam_name || '',
+        league_name: ev.league_name || '',
+        match_date: ev.match_date || '',
+        match_time: ev.match_time || '',
+      });
+    }
+
+    res.json(enriched);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/analyze — ChatGPT analysis
 app.post('/api/analyze', async (req, res) => {
   try {

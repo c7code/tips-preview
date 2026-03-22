@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Calendar, TrendingUp } from 'lucide-react'
+import { Calendar, TrendingUp, Ticket } from 'lucide-react'
 import { LEAGUES } from '../components/Sidebar'
 import MatchCard from '../components/MatchCard'
+import TicketModal from '../components/TicketModal'
 import { fetchEvents } from '../api/footballApi'
 
 function formatDate(offset = 0) {
@@ -21,6 +22,7 @@ export default function Dashboard() {
   const [activeLeague, setActiveLeague] = useState(null) // null = all
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showTicket, setShowTicket] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -62,12 +64,22 @@ export default function Dashboard() {
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">
-          <Calendar size={28} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 10, color: 'var(--accent-primary)' }} />
-          Match Center
-        </h1>
-        <p className="page-subtitle">Track live and upcoming matches across all major leagues</p>
+        <div className="page-header-top">
+          <div>
+            <h1 className="page-title">
+              <Calendar size={28} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 10, color: 'var(--accent-primary)' }} />
+              Match Center
+            </h1>
+            <p className="page-subtitle">Track live and upcoming matches across all major leagues</p>
+          </div>
+          <button className="ticket-cta-btn" onClick={() => setShowTicket(true)}>
+            <Ticket size={20} />
+            Gerar Bilhete
+          </button>
+        </div>
       </div>
+
+      <TicketModal show={showTicket} onClose={() => setShowTicket(false)} />
 
       {/* Day tabs */}
       <div className="tabs">
