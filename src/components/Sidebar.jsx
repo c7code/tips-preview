@@ -8,6 +8,8 @@ const LEAGUES = [
   { id: 175, name: 'Bundesliga', country: 'Germany', flag: '🇩🇪' },
   { id: 168, name: 'Ligue 1', country: 'France', flag: '🇫🇷' },
   { id: 99, name: 'Brasileirão', country: 'Brazil', flag: '🇧🇷' },
+  { id: 75, name: 'Série B', country: 'Brazil', flag: '🇧🇷' },
+  { id: 44, name: 'Liga Argentina', country: 'Argentina', flag: '🇦🇷' },
   { id: 244, name: 'Eredivisie', country: 'Netherlands', flag: '🇳🇱' },
   { id: 266, name: 'Primeira Liga', country: 'Portugal', flag: '🇵🇹' },
   { id: 332, name: 'MLS', country: 'USA', flag: '🇺🇸' },
